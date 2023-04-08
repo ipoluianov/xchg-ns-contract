@@ -39,6 +39,16 @@ contract DomainRegistry {
         return len;
     }
 
+    function myDomains() public view returns (uint) {
+        uint counter = 0;
+        for (uint i = 0; i < domainCount; i++) {
+            if (domains[i].owner == msg.sender) {
+                counter++;
+            }
+        }
+        return counter;
+    }
+
     function checkDomainName(bytes32 bs, bool allowPoint) public pure {
         uint256 i = 0;
         while (bs[i] != 0 && i < 32) {
@@ -72,7 +82,7 @@ contract DomainRegistry {
             lenOfBytes32(_parentDomainName) > 0,
             "parent domain name len must be > 0"
         );
-        uint256 parentDomainId = findDomainId(_parentDomainName);
+        uint256 parentDomainId = findDomainId(_parentDomainName, true);
 
         require(
             domains[parentDomainId].isRegistered,
@@ -85,6 +95,17 @@ contract DomainRegistry {
 
         checkDomainName(_name, false);
 
+        bytes32 fullName = _name;
+        fullName = fullName | (bytes32(0x2E00000000000000000000000000000000000000000000000000000000000000) >> (lenOfBytes32(_name) * 8));
+        // append parent domain
+        for (uint i = 0; i < lenOfBytes32(_parentDomainName); i++) {
+            uint offset = lenOfBytes32(_name) + 1 + i;
+            fullName = fullName | (bytes32(_parentDomainName[i]) >> (offset * 8));
+        }
+
+        uint256 existingDomainId = findDomainId(fullName, false);
+        require(existingDomainId == 0, "domain already exists");
+
         uint256 domainId = domainCount + 1;
         domains[domainId] = Domain(
             true,
@@ -96,21 +117,12 @@ contract DomainRegistry {
         domains[parentDomainId].subDomainIds.push(domainId);
         domainCount++;
 
-        bytes32 fullName = _name;
-        fullName = fullName | (bytes32(0x2E00000000000000000000000000000000000000000000000000000000000000) >> (lenOfBytes32(_name) * 8));
-        // append parent domain
-        for (uint i = 0; i < lenOfBytes32(_parentDomainName); i++) {
-            uint offset = lenOfBytes32(_name) + 1 + i;
-            fullName = fullName | (bytes32(0x2E00000000000000000000000000000000000000000000000000000000000000) >> (offset * 8));
-        }
-        
-
         emit Registered(msg.sender, fullName, 0);
 
         return domainId;
     }
 
-    function findDomainId(bytes32 _name) public view returns (uint256) {
+    function findDomainId(bytes32 _name, bool panicIfNotFound) public view returns (uint256) {
         require(lenOfBytes32(_name) > 0, "name is empty");
         checkDomainName(_name, true);
 
@@ -141,7 +153,11 @@ contract DomainRegistry {
                     break;
                 }
             }
-            require(foundSubDomain, "Domain does not exist");
+            if (panicIfNotFound) {
+                require(foundSubDomain, "Domain does not exist");
+            }
+            if (!foundSubDomain)
+                return 0;
         }
         return currentDomainId;
     }
