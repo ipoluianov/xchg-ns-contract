@@ -16,7 +16,10 @@ contract DomainRegistry {
 
     bytes32 currentDomainPrefix = "xchg";
 
-    constructor() {
+    event Registered(address indexed _owner, bytes32 indexed _name, bytes32 _address);
+
+    constructor(bytes32 prefix) {
+        currentDomainPrefix = prefix;
         rootDomainId = domainCount + 1;
         domains[rootDomainId] = Domain(
             true,
@@ -92,6 +95,17 @@ contract DomainRegistry {
         );
         domains[parentDomainId].subDomainIds.push(domainId);
         domainCount++;
+
+        bytes32 fullName = _name;
+        fullName = fullName | (bytes32(0x2E00000000000000000000000000000000000000000000000000000000000000) >> (lenOfBytes32(_name) * 8));
+        // append parent domain
+        for (uint i = 0; i < lenOfBytes32(_parentDomainName); i++) {
+            uint offset = lenOfBytes32(_name) + 1 + i;
+            fullName = fullName | (bytes32(0x2E00000000000000000000000000000000000000000000000000000000000000) >> (offset * 8));
+        }
+        
+
+        emit Registered(msg.sender, fullName, 0);
 
         return domainId;
     }
