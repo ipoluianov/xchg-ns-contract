@@ -1,11 +1,12 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-contract DomainRegistry {
+contract XchgNs {
     struct Domain {
         bool isRegistered;
         address owner;
         bytes32 name;
+        bytes32 fullName;
         uint256 parentDomainId;
         uint256[] subDomainIds;
     }
@@ -25,6 +26,7 @@ contract DomainRegistry {
             true,
             msg.sender,
             currentDomainPrefix,
+            currentDomainPrefix,
             0,
             new uint256[](0)
         );
@@ -41,12 +43,38 @@ contract DomainRegistry {
 
     function myDomains() public view returns (uint) {
         uint counter = 0;
-        for (uint i = 0; i < domainCount; i++) {
+        for (uint i = 1; i < domainCount+1; i++) {
             if (domains[i].owner == msg.sender) {
                 counter++;
             }
         }
         return counter;
+    }
+
+    function getMyDomain(uint index) public view returns(bytes32) {
+        uint counter = 0;
+        for (uint i = 1; i < domainCount+1; i++) {
+            if (domains[i].owner == msg.sender) {
+                if (counter == index) {
+                    return domains[i].name;
+                }
+                counter++;
+            }
+        }
+        return 0;
+    }
+
+    function getMyDomainInfo(uint index) public view returns(Domain memory result) {
+        uint counter = 0;
+        for (uint i = 1; i < domainCount+1; i++) {
+            if (domains[i].owner == msg.sender) {
+                if (counter == index) {
+                    return domains[i];
+                }
+                counter++;
+            }
+        }
+        require(false);
     }
 
     function checkDomainName(bytes32 bs, bool allowPoint) public pure {
@@ -111,6 +139,7 @@ contract DomainRegistry {
             true,
             msg.sender,
             _name,
+            fullName,
             parentDomainId,
             new uint256[](0)
         );

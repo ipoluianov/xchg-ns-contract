@@ -1,0 +1,25 @@
+{
+  "name": "xchg-ns-contract",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ipoluianov/xchg-ns-contract.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ipoluianov/xchg-ns-contract/issues"
+  },
+  "homepage": "https://github.com/ipoluianov/xchg-ns-contract#readme",
+  "dependencies": {
+    "hardhat": "^2.13.1"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^2.0.2"
+  }
+}
