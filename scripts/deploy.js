@@ -12,7 +12,7 @@ async function main() {
 
   await xchgNs.deployed();
 
-  console.log("deployed");
+  console.log("deployed", xchgNs.address);
 }
 
 // We recommend this pattern to be able to use async/await everywhere
