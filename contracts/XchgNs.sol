@@ -7,6 +7,7 @@ contract XchgNs {
         address owner;
         bytes32 name;
         bytes32 fullName;
+        bytes32 xchgAddress;
         uint256 parentDomainId;
         uint256[] subDomainIds;
     }
@@ -27,6 +28,7 @@ contract XchgNs {
             msg.sender,
             currentDomainPrefix,
             currentDomainPrefix,
+            0,
             0,
             new uint256[](0)
         );
@@ -101,7 +103,7 @@ contract XchgNs {
         }
     }
 
-    function registerDomain(bytes32 _name, bytes32 _parentDomainName)
+    function registerDomain(bytes32 _name, bytes32 _parentDomainName, bytes32 _xchgAddress)
         public
         payable
         returns (uint256)
@@ -140,6 +142,7 @@ contract XchgNs {
             msg.sender,
             _name,
             fullName,
+            _xchgAddress,
             parentDomainId,
             new uint256[](0)
         );

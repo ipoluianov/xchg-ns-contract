@@ -17,7 +17,12 @@
   },
   "homepage": "https://github.com/ipoluianov/xchg-ns-contract#readme",
   "dependencies": {
-    "hardhat": "^2.13.1"
+    "@fortawesome/fontawesome-svg-core": "^6.4.0",
+    "base32": "^0.0.7",
+    "base32.js": "^0.1.0",
+    "buffer": "^6.0.3",
+    "hardhat": "^2.13.1",
+    "vue-awesome": "^4.5.0"
   },
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox": "^2.0.2"
