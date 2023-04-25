@@ -9,7 +9,23 @@ export default {
             return wallet.bytes32ToString(this.domain.fullName.toString());
         },
         xchgAddressString() {
-            return wallet.bytes32ToString(this.domain.xchgAddress.toString());
+            let xchgAddrHex = this.domain.xchgAddress.toString().substring(2, 2 + 30 * 2);
+            xchgAddrHex = xchgAddrHex.toUpperCase();
+            console.log("xchgAddrHex", xchgAddrHex)
+            let addrAsBytes = new ArrayBuffer(30);
+            const typedArray1 = new Uint8Array(addrAsBytes);
+
+            for (let i = 0; i < 30; i++) {
+                let chex = xchgAddrHex.substring(i * 2, i * 2 + 2);
+                let b = parseInt(chex, 16);
+                typedArray1[i] = b;
+            }
+
+            let bs = wallet.arrayBufferToBinaryString(typedArray1.buffer);
+
+            let addrAsB32 = wallet.base32().encode32(bs).toLowerCase();
+            
+            return addrAsB32;
         }
     },
     methods: {

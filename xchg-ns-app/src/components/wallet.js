@@ -74,6 +74,16 @@ export default {
       while (b321.length < 64) b321 += "0";
       return "0x" + b321;
     },
+    arrayBufferToBinaryString(arrayBuffer) {
+      var binaryString = "";
+      var bytes = new Uint8Array(arrayBuffer);
+      var len = bytes.byteLength;
+      for (var i = 0; i < len; i++) {
+          binaryString += String.fromCharCode(bytes[i]);
+      }
+      return binaryString;
+  },
+
 
     binaryStringToArrayBuffer(binaryString) {
       var len = binaryString.length;
