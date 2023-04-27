@@ -17,7 +17,7 @@ export default {
     },
     methods: {
         registerSubdomain() {
-            this.$emit('registerSubdomain', wallet.bytes32ToString(this.domain.fullName.toString()));
+            this.$emit('registerSubdomain', bytes32.bytes32ToString(this.domain.fullName.toString()));
         }
     }
 }
