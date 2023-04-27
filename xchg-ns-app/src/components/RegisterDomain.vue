@@ -1,7 +1,8 @@
 <script>
 import connect1 from '../components/wallet'
-import { Buffer } from "buffer"
 import ErrorMessage from './ErrorMessage.vue'
+import xchg_utils from './xchg_utils'
+import bytes32 from './bytes32'
 
 export default {
     data() {
@@ -24,8 +25,8 @@ export default {
             console.log("Register", this.domainNameToRegister);
             console.log("Signer", await this.signer.getAddress());
             try {
-                let xchgAddr = connect1.xchgAddressToBinary(this.xchgAddress);
-                let tx = await this.contract.registerDomain(connect1.stringToBytes32(this.domainNameToRegister), connect1.stringToBytes32(this.parentDomain), xchgAddr);
+                let xchgAddr = xchg_utils.xchgAddressToBinary(this.xchgAddress);
+                let tx = await this.contract.registerDomain(bytes32.stringToBytes32(this.domainNameToRegister), bytes32.stringToBytes32(this.parentDomain), xchgAddr);
                 this.message = "processing ...";
                 await tx.wait();
                 this.message = "complete";

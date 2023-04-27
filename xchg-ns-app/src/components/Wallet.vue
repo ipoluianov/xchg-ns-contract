@@ -15,6 +15,7 @@
 import wallet from "./wallet"
 import { ethers } from "ethers";
 import { Buffer } from "buffer"
+import js_utils from "./js_utils";
 
 export default {
     data() {
@@ -62,7 +63,7 @@ export default {
             }
             console.log("get-balance");
             this.balance = await this.signer.getBalance();
-            this.balance = wallet.truncate(ethers.utils.formatEther(this.balance), 5)
+            this.balance = js_utils.truncate(ethers.utils.formatEther(this.balance), 5)
             this.connected = true;
             this.signer.provider.getNetwork().then(network => {
                 const chainId = network.chainId;
