@@ -1,7 +1,9 @@
 
 <script>
 import DomainListItem from "./DomainListItem.vue"
-import wallet from "./wallet"
+import wallet from "./lib/wallet"
+import XchgNs from "./contract/XchgNs.json"
+import XchgNsAddress from "./contract/XchgNsAddress.json"
 
 export default {
   mounted() {
@@ -21,7 +23,7 @@ export default {
       this.$emit('registerSubdomain', parentDomain);
     },
     async updateDomains() {
-      [this.signer, this.contract] = await wallet.connect(() => {
+      [this.signer, this.contract] = await wallet.connect(XchgNsAddress.address, XchgNs.abi, () => {
         this.resetState();
       });
 
@@ -51,7 +53,7 @@ export default {
 </template>
 
 <style scoped>
-  .main {
-    padding: 6px;
-  }
+.main {
+  padding: 6px;
+}
 </style>

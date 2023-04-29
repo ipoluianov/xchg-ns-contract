@@ -1,8 +1,7 @@
 <script>
-import { Buffer } from "buffer"
-import wallet from "./wallet"
-import b32 from "./b32"
-import bytes32 from "./bytes32"
+import wallet from "./lib/wallet"
+// import b32 from "./b32"
+import bytes32 from "./lib/bytes32"
 
 export default {
     props: ['domain'],

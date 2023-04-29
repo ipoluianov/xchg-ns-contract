@@ -1,12 +1,17 @@
 <script>
-import connect1 from '../components/wallet'
+import connect1 from './lib/wallet'
 import ErrorMessage from './ErrorMessage.vue'
-import xchg_utils from './xchg_utils'
-import bytes32 from './bytes32'
+import xchg_utils from './lib/xchg_utils'
+import bytes32 from './lib/bytes32'
+
+import XchgNs from "./contract/XchgNs.json"
+import XchgNsAddress from "./contract/XchgNsAddress.json"
+
 
 export default {
     data() {
         return {
+            message: "",
             domainNameToRegister: "",
             errorText: null,
             currentTransactionHash: null,
@@ -21,7 +26,7 @@ export default {
     methods: {
         async register() {
             this.errorText = "";
-            [this.signer, this.contract] = await connect1.connect();
+            [this.signer, this.contract] = await connect1.connect(XchgNsAddress.address, XchgNs.abi);
             console.log("Register", this.domainNameToRegister);
             console.log("Signer", await this.signer.getAddress());
             try {

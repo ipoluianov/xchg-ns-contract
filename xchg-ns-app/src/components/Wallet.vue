@@ -12,10 +12,13 @@
 </template>
 
 <script>
-import wallet from "./wallet"
+import wallet from "./lib/wallet"
 import { ethers } from "ethers";
-import { Buffer } from "buffer"
-import js_utils from "./js_utils";
+import js_utils from "./lib/js_utils";
+
+import XchgNs from "./contract/XchgNs.json"
+import XchgNsAddress from "./contract/XchgNsAddress.json"
+
 
 export default {
     data() {
@@ -35,7 +38,7 @@ export default {
     emits: ["connected", "disconnected"],
     methods: {
         async connectWallet() {
-            [this.signer, this.contract] = await wallet.connect(() => {
+            [this.signer, this.contract] = await wallet.connect(XchgNsAddress.address, XchgNs.abi, () => {
                 this.resetState();
             });
             this.selectedAddress = await this.signer.getAddress();

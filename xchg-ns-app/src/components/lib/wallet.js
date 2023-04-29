@@ -1,11 +1,9 @@
 import { ethers } from "ethers";
-import constractDescription from "../components/XchgNsAbi.json"
-import { Buffer } from "buffer"
 import b32 from "./b32"
 import js_utils from "./js_utils";
 
 export default {
-  async connect(onChanged) {
+  async connect(contractAddress, contractAbi, onChanged) {
     console.log("CONNECT");
     if (window.ethereum === undefined) {
       console.log("MetaMask not found")
@@ -22,7 +20,7 @@ export default {
     });
 
     let signer = await provider.getSigner();
-    let contract = new ethers.Contract("0x5FbDB2315678afecb367f032d93F642f64180aa3", constractDescription.abi, signer);
+    let contract = new ethers.Contract(contractAddress, contractAbi, signer);
     return [signer, contract]
   },
 

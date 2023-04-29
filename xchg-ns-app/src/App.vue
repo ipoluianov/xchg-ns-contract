@@ -4,6 +4,7 @@ import constractDescription from "../src/components/XchgNsAbi.json"
 import DomainsList from "./components/DomainsList.vue";
 import Wallet from "./components/Wallet.vue"
 import Header from "./components/Header.vue"
+import TabControl from "./components/TabControl.vue";
 
 export default {
   data() {
@@ -23,6 +24,7 @@ export default {
     DomainsList,
     Wallet,
     Header,
+    TabControl,
   },
 
   // `mounted` is a lifecycle hook which we will explain later
@@ -74,6 +76,7 @@ export default {
   <div class="wrapper">
     <Header></Header>
     <Wallet @connected="this.onConnected" @disconnected="this.onDisconnected"/>
+    <TabControl></TabControl>
     <div v-if="this.dialog == 'reg'">
       <RegisterDomain @on-register="this.registered" @cancel="this.mainForm" :parent-domain=this.parentDomainForReg />
     </div>
