@@ -12,13 +12,23 @@ contract XchgNs {
         uint256[] subDomainIds;
     }
 
+    struct DomainsOfUser {
+        uint256[] domains;
+    }
+
     mapping(uint256 => Domain) public domains;
+    mapping(address => DomainsOfUser) private domainsOfUser;
+    mapping(bytes32 => uint256) public domainsByNameHash;
     uint256 public domainCount = 0;
     uint256 public rootDomainId;
 
     bytes32 currentDomainPrefix = "xchg";
 
-    event Registered(address indexed _owner, bytes32 indexed _name, bytes32 _address);
+    event Registered(
+        address indexed _owner,
+        bytes32 indexed _name,
+        bytes32 _address
+    );
 
     constructor(bytes32 prefix) {
         currentDomainPrefix = prefix;
@@ -43,40 +53,17 @@ contract XchgNs {
         return len;
     }
 
-    function myDomains() public view returns (uint) {
-        uint counter = 0;
-        for (uint i = 1; i < domainCount+1; i++) {
-            if (domains[i].owner == msg.sender) {
-                counter++;
-            }
+    function getDomainsOfUser(
+        address addr
+    ) public view returns (Domain[] memory) {
+        Domain[] memory result = new Domain[](
+            domainsOfUser[addr].domains.length
+        );
+        for (uint i = 0; i < domainsOfUser[addr].domains.length; i++) {
+            Domain storage domain = domains[domainsOfUser[addr].domains[i]];
+            result[i] = domain;
         }
-        return counter;
-    }
-
-    function getMyDomain(uint index) public view returns(bytes32) {
-        uint counter = 0;
-        for (uint i = 1; i < domainCount+1; i++) {
-            if (domains[i].owner == msg.sender) {
-                if (counter == index) {
-                    return domains[i].name;
-                }
-                counter++;
-            }
-        }
-        return 0;
-    }
-
-    function getMyDomainInfo(uint index) public view returns(Domain memory result) {
-        uint counter = 0;
-        for (uint i = 1; i < domainCount+1; i++) {
-            if (domains[i].owner == msg.sender) {
-                if (counter == index) {
-                    return domains[i];
-                }
-                counter++;
-            }
-        }
-        require(false);
+        return result;
     }
 
     function checkDomainName(bytes32 bs, bool allowPoint) public pure {
@@ -103,11 +90,11 @@ contract XchgNs {
         }
     }
 
-    function registerDomain(bytes32 _name, bytes32 _parentDomainName, bytes32 _xchgAddress)
-        public
-        payable
-        returns (uint256)
-    {
+    function registerDomain(
+        bytes32 _name,
+        bytes32 _parentDomainName,
+        bytes32 _xchgAddress
+    ) public payable returns (uint256) {
         require(
             lenOfBytes32(_parentDomainName) > 0,
             "parent domain name len must be > 0"
@@ -126,11 +113,17 @@ contract XchgNs {
         checkDomainName(_name, false);
 
         bytes32 fullName = _name;
-        fullName = fullName | (bytes32(0x2E00000000000000000000000000000000000000000000000000000000000000) >> (lenOfBytes32(_name) * 8));
+        fullName =
+            fullName |
+            (bytes32(
+                0x2E00000000000000000000000000000000000000000000000000000000000000
+            ) >> (lenOfBytes32(_name) * 8));
         // append parent domain
         for (uint i = 0; i < lenOfBytes32(_parentDomainName); i++) {
             uint offset = lenOfBytes32(_name) + 1 + i;
-            fullName = fullName | (bytes32(_parentDomainName[i]) >> (offset * 8));
+            fullName =
+                fullName |
+                (bytes32(_parentDomainName[i]) >> (offset * 8));
         }
 
         uint256 existingDomainId = findDomainId(fullName, false);
@@ -147,6 +140,9 @@ contract XchgNs {
             new uint256[](0)
         );
         domains[parentDomainId].subDomainIds.push(domainId);
+        domainsOfUser[msg.sender].domains.push(domainId);
+        bytes32 nameHash = keccak256(abi.encode(fullName));
+        domainsByNameHash[nameHash] = domainId;
         domainCount++;
 
         emit Registered(msg.sender, fullName, 0);
@@ -154,7 +150,10 @@ contract XchgNs {
         return domainId;
     }
 
-    function findDomainId(bytes32 _name, bool panicIfNotFound) public view returns (uint256) {
+    function findDomainId(
+        bytes32 _name,
+        bool panicIfNotFound
+    ) public view returns (uint256) {
         require(lenOfBytes32(_name) > 0, "name is empty");
         checkDomainName(_name, true);
 
@@ -168,7 +167,11 @@ contract XchgNs {
 
         uint256 currentDomainId = rootDomainId;
 
-        for (uint256 indexOfPart = 1; indexOfPart < parts.length; indexOfPart++) {
+        for (
+            uint256 indexOfPart = 1;
+            indexOfPart < parts.length;
+            indexOfPart++
+        ) {
             uint i = parts.length - 1 - indexOfPart;
             bool foundSubDomain = false;
             for (
@@ -177,9 +180,7 @@ contract XchgNs {
                 j++
             ) {
                 uint256 subDomainId = domains[currentDomainId].subDomainIds[j];
-                if (
-                    domains[subDomainId].name == parts[i]
-                ) {
+                if (domains[subDomainId].name == parts[i]) {
                     currentDomainId = subDomainId;
                     foundSubDomain = true;
                     break;
@@ -188,8 +189,7 @@ contract XchgNs {
             if (panicIfNotFound) {
                 require(foundSubDomain, "Domain does not exist");
             }
-            if (!foundSubDomain)
-                return 0;
+            if (!foundSubDomain) return 0;
         }
         return currentDomainId;
     }
